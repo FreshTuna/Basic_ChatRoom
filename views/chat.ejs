@@ -1,0 +1,170 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name='viewport' content="width=device-width, initial-scale=1.0">
+        <title>testchat</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <style>
+            .card-body{
+                padding:0.5rem;
+                
+            }
+            .mt-4, .my-4 {
+                margin-top: 0.9rem!important;
+                margin-bottom: 0.2rem;
+                width:50%;
+            }
+            /* .sendBar {
+                position:fixed;
+            } */
+            .input-group{
+                margin-top: 0.4 rem;
+            }
+            .container{
+                margin-top:0.5rem;
+                background-color: white;
+            }
+
+            /* ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background-color: #333;
+            }
+
+            li {
+                float: left;
+            }
+
+            li a {
+                display: block;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            }
+
+            li a:hover {
+                background-color: #111;
+                display: block;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            } */
+            /* body{
+                background-color: aquamarine;
+            } */
+            
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <a routerLink="/" class="navbar-brand" href="http://localhost:3000">ChatRoom</a>
+            <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+            <a class="nav-link" href="signup">SignUp</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="signin">SignIn</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="signout" id="signout">SignOut</a>
+            </li>
+            </ul>
+        </nav>
+        <div class="container">
+            <div class="card card-4">
+            <div class="content" id="chatbox" style="overflow:scroll; height:750px;">
+            <% messages.forEach(message => { %>
+                <% if(message.user == user && user!=undefined){ %>
+                <div class="card mt-4"  style="float: left; clear:both; margin: 5px 45px 5px 20px; background-color: cornflowerblue;">
+                    <div class="card-body"> 
+                        <span class="card-title" style="font-size: 10px;"><%= message.id%></span>
+                        <p class="card-body" style="text-align: justify;"><%= message.content %><span style="font-size: 10px;display:block;text-align:right;"><%=message.createdAt %></span></p>
+                    </div>
+                </div>
+                <% }  else { %>
+                    <div class="card mt-4"  style="float: right; clear:both; margin: 5px 20px 5px 45px;"">
+                        <div class="card-body">
+                            <span class="card-title" style="font-size: 10px;"><%= message.id%></span>
+                            <p class="card-body" style="text-align: justify;"><%= message.content %><span style="font-size: 10px;display:block;text-align:right;"><%=message.createdAt %></span></p>
+                        </div>
+                    </div>
+                    <% } %>
+            <% }) %>
+            </div>
+            <form>
+                <div class="input-group">
+                    <input type="text" name="content" id="content" class="form-control">
+                    <div class="input-group-prepend">
+                            <button id="send_btn" class="btn btn-primary">></button>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+
+        <script>
+            var scrollDiv = document.getElementById("chatbox");
+            scrollDiv.scrollTop = scrollDiv.scrollHeight;
+
+            var input = document.getElementById("content");
+            var send_btn = document.getElementById("send_btn");
+            send_btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                send_message_from_input();
+            });
+
+            function send_message_from_input() {
+                if(input.value) {
+                    add_message_to_db(input.value, function(response) {
+                        if(response) {
+                            location.reload();
+                        } else {
+                            alert("ERROR");
+                        }
+                    });
+                } else {
+                    alert("EMPTY MESSAGE");
+                }
+            }
+
+            async function add_message_to_db(message, callback) {
+                let response = await fetch('messages/',{
+                    method: 'POST',
+                    headers:{
+                        'Content-Type' : 'application/json;charset=utf-8'
+                    },
+                    body:JSON.stringify({content:message})
+                }).then(response => {
+                    if(response.status === 200 || response.status === 201) {
+                        callback(response)
+                    } else {
+                        callback(undefined)
+                    }
+                }).catch(err => console.error(err));
+            }
+
+            var signout_btn = document.getElementById("signout");
+            signout_btn.addEventListener("click", async function(e) {
+                e.preventDefault();
+                let response = await fetch('users/signout/',{
+                    method: 'POST',
+                    headers:{
+                        'Content-Type' : 'application/json;charset=utf-8'
+                    },
+                    body:''
+                }).then(response => {
+                    if(response.status === 200 || response.status === 201) {
+                        location.reload();
+                    } else {
+                        console.error(response.statusText);
+                    }
+                }).catch(err => console.error(err));
+            });
+
+        </script>
+    </body>
+</html>
