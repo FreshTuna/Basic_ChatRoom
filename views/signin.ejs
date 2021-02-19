@@ -59,7 +59,7 @@
         send_btn.addEventListener('click',function(e) {
             e.preventDefault();
             send_user_info_from_input();
-            // location.replace("http://localhost:3000/")
+            location.replace("http://localhost:3000/")
         })
 
         function send_user_info_from_input() {
@@ -85,28 +85,7 @@
             }
             return undefined;
         }
-
-        // async function signin_user_check_db(email, password, callback) {
-        //     var sending_data = {'email':email, 'password':password};
-        //     const response = await fetch('users/signin/', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type' : 'application/json;charset=utf-8'
-        //         },
-        //         body: JSON.stringify(sending_data)
-                
-        //     })
-        //     if(response.status === 200 || response.status === 201) {
-        //         await 
-        //     }
-        //     .then(response => {
-        //         if(response.status === 200 || response.status === 201){
-        //             callback(response);
-        //         } else {
-        //             callback(undefined);
-        //         }
-        //     }).catch(err => console.error(err));
-        // }
+        
         var signout_btn = document.getElementById("signout");
         signout_btn.addEventListener("click", async function(e) {
             e.preventDefault();
