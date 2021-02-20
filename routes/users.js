@@ -1,11 +1,14 @@
 const router = require('express').Router();
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+const SECRET_KEY = process.env.SECRET_KEY;
+
 var UserModel = require('../models/users')(mongoose);
 
 router.post('/signup', function(req,res,next) {
-    console.log("signup here@@@@@@@@@@@@@@");
     // console.log("email: ",req.body.email,"password: ",req.body.password);
-    console.log('what is req body : ',req.body);
     if(req.body.email && req.body.password) {
         console.log("signup here");
         signup_user(req.body.email, req.body.password, function(response) {
@@ -17,11 +20,12 @@ router.post('/signup', function(req,res,next) {
 });
 
 router.post('/signin', function(req,res,next) {
-    console.log('what is req body : ',req.body);
     if(req.body.email && req.body.password) {
-        signin_user(req.body.email, req.body.password, function(response) {
+        signin_user(req.body.email, req.body.password, async (response) => {
             if(response.success){
-                res.cookie("user",req.body.email,{signed: true});
+                console.log("response_user :",response.user);
+                const token = jwt.sign({user:response.user}, SECRET_KEY,{expiresIn:'1h'});
+                res.cookie("user",token);
                 res.status(200).json(response);
             }
             else{
@@ -63,7 +67,7 @@ function signin_user(email, password, callback) {
         if(err || user === null) {
             callback({"success": false});
         } else {
-            callback({"success": true});
+            callback({"success": true,"user":user});
         }
     });
 }

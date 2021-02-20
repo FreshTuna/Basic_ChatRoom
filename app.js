@@ -5,6 +5,9 @@ const Message = require('./models/messages');
 const messageRouter = require('./routes/messages');
 const userRouter = require('./routes/users');
 const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const app = express();
 
@@ -40,8 +43,14 @@ app.get('/', async (req,res) => {
     const messages = await Message.find().sort({
         'id':1
     })
-    console.log(req.cookies['user']);
-    res.render('chat',{messages:messages,user:req.signedCookies['user']});
+    console.log("is there cookie? :",req.cookies['user']);
+    if(req.cookies['user']){
+        const cookie = jwt.verify(req.cookies['user'], SECRET_KEY);
+        console.log("cookie :", cookie);
+        res.render('chat',{messages:messages,user:cookie.user.email});
+    } else {
+        res.render('chat',{messages:messages,user:undefined});
+    }
 });
 
 app.get('/signup',(req,res) => {

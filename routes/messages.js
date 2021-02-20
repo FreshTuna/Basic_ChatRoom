@@ -1,10 +1,14 @@
 const router = require('express').Router();
 const Message = require('../models/messages');
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
+
+const SECRET_KEY = process.env.SECRET_KEY;
 
 router.post('/',(req,res) => {
-    var cookie = req.signedCookies['user'];
+    var cookie = jwt.verify(req.cookies['user'],SECRET_KEY);
     console.log("cookie =",cookie)
-    var sendingObject = Object.assign(req.body,{'user':cookie})
+    var sendingObject = Object.assign(req.body,{'user':cookie.email})
     Message.create(sendingObject)
         .then(message => res.send(message))
         .catch(err => res.status(500).send(err));

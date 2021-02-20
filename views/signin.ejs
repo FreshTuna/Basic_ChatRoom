@@ -56,9 +56,9 @@
         let password = document.getElementById('password');
         let send_btn = document.getElementById('send_btn');
 
-        send_btn.addEventListener('click',function(e) {
+        send_btn.addEventListener('click', async (e) => {
             e.preventDefault();
-            send_user_info_from_input();
+            await send_user_info_from_input();
             location.replace("http://localhost:3000/")
         })
 
@@ -85,7 +85,7 @@
             }
             return undefined;
         }
-        
+
         var signout_btn = document.getElementById("signout");
         signout_btn.addEventListener("click", async function(e) {
             e.preventDefault();
