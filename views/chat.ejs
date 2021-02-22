@@ -11,12 +11,9 @@
             }
             .mt-4, .my-4 {
                 margin-top: 0.9rem!important;
-                margin-bottom: 0.2rem;
+                margin-bottom: 0.9rem!important;
                 width:50%;
             }
-            /* .sendBar {
-                position:fixed;
-            } */
             .input-group{
                 margin-top: 0.4 rem;
             }
@@ -24,39 +21,31 @@
                 margin-top:0.5rem;
                 background-color: white;
             }
-
-            /* ul {
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-                background-color: #333;
+            .my-message {
+                float: right; clear:both; margin: 5px 45px 5px 20px; background-color: cornflowerblue;
             }
-
-            li {
-                float: left;
+            .card-body span {
+                font-size: 10px
             }
-
-            li a {
-                display: block;
-                color: white;
+            .card-body p {
+                text-align: justify;
+            }
+            .card-body .time {
+                font-size: 10px;display:block;text-align:right;
+            }
+            .your-message {
+                float: left; clear:both; margin: 5px 20px 5px 45px;
+            }
+            .enter-message {
+                background-color: #f2f2f2;
+                width:90%;
+                height: 8%;
+                margin: 0px auto;
+            }
+            .enter-message p{
                 text-align: center;
-                padding: 14px 16px;
-                text-decoration: none;
             }
 
-            li a:hover {
-                background-color: #111;
-                display: block;
-                color: white;
-                text-align: center;
-                padding: 14px 16px;
-                text-decoration: none;
-            } */
-            /* body{
-                background-color: aquamarine;
-            } */
-            
         </style>
     </head>
     <body>
@@ -74,22 +63,21 @@
             </li>
             </ul>
         </nav>
+        </div>
         <div class="container">
             <div class="card card-4">
             <div class="content" id="chatbox" style="overflow:scroll; height:750px;">
             <% messages.forEach(message => { %>
                 <% if(message.user == user && user!=undefined){ %>
-                <div class="card mt-4"  style="float: left; clear:both; margin: 5px 45px 5px 20px; background-color: cornflowerblue;">
+                <div class="card mt-4 my-message">
                     <div class="card-body"> 
-                        <span class="card-title" style="font-size: 10px;"><%= message.id%></span>
-                        <p class="card-body" style="text-align: justify;"><%= message.content %><span style="font-size: 10px;display:block;text-align:right;"><%=message.createdAt %></span></p>
+                        <p class="card-body"><%= message.content %><span class="time"><%=message.createdAt %></span></p>
                     </div>
                 </div>
                 <% }  else { %>
-                    <div class="card mt-4"  style="float: right; clear:both; margin: 5px 20px 5px 45px;"">
+                    <div class="card mt-4 your-message">
                         <div class="card-body">
-                            <span class="card-title" style="font-size: 10px;"><%= message.id%></span>
-                            <p class="card-body" style="text-align: justify;"><%= message.content %><span style="font-size: 10px;display:block;text-align:right;"><%=message.createdAt %></span></p>
+                            <p class="card-body"><%= message.content %><span class="time"><%=message.createdAt %></span></p>
                         </div>
                     </div>
                     <% } %>
@@ -104,10 +92,14 @@
                 </div>
             </form>
             </div>
+            <input type="hidden" id="myJsonData" value="<%=JSON.stringify(user)%>" />
         </div>
-
+        <script src="/socket.io/socket.io.js"></script>
         <script>
+            const socket = io();
+            
             var scrollDiv = document.getElementById("chatbox");
+            var enterBox = document.getElementById("enter");
             scrollDiv.scrollTop = scrollDiv.scrollHeight;
 
             var input = document.getElementById("content");
@@ -115,13 +107,16 @@
             send_btn.addEventListener("click", function(e) {
                 e.preventDefault();
                 send_message_from_input();
+                socket.emit('chat-message',input.value);
+                input.value = '';
             });
 
             function send_message_from_input() {
                 if(input.value) {
                     add_message_to_db(input.value, function(response) {
                         if(response) {
-                            location.reload();
+                            // document.getElementById('message').innerHTML = response;
+                            // location.reload();
                         } else {
                             alert("ERROR");
                         }
@@ -139,6 +134,7 @@
                     },
                     body:JSON.stringify({content:message})
                 }).then(response => {
+                    console.log(response);
                     if(response.status === 200 || response.status === 201) {
                         callback(response)
                     } else {
@@ -164,6 +160,41 @@
                     }
                 }).catch(err => console.error(err));
             });
+
+            // SOCKET SECTION 
+            const userData = <%-JSON.stringify(user)%>
+
+            socket.emit('connected', userData);
+
+            socket.on('enterance-message', (user) => {
+                new_message(user,"enter-message");
+            });
+
+            socket.on('leave-message', (user) => {
+                new_message(user,"enter-message");
+            });
+
+            socket.on('chat-message', (msg) => {
+                new_message(msg,"your-message");
+            });
+            
+            socket.on('my-message', (msg) => {
+                new_message(msg,"my-message");
+            })
+
+            const new_message = (content, className) => {
+                const message = document.createElement('div');
+                message.classList.add('card','mt-4',`${className}`);
+                let times = new Date().toLocaleTimeString();
+                let innerText= `<div class="card-body"> 
+                        <p class="card-body">${content}<span class="time">${times}</span></p>
+                    </div>`
+                message.innerHTML = innerText;
+                scrollDiv.appendChild(message);
+                scrollDiv.scrollTop = scrollDiv.scrollHeight;
+            }
+
+
 
         </script>
     </body>
