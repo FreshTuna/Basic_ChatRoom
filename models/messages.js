@@ -36,5 +36,6 @@ messageSchema.statics.create = function (payload) {
     return message.save();
 };
 
+
 var Message = connection.model('Message',messageSchema);
 module.exports = mongoose.model('Message',messageSchema);

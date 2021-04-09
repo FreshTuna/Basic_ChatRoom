@@ -44,7 +44,7 @@ router.post('/signout', function(req,res,next) {
 
 
 
-function signup_user(email, password, callback) {
+async function signup_user(email, password, callback) {
     var newUser = new UserModel.user({
         email   : email,
         password: password

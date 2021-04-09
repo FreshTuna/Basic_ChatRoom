@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.3",
     "mongoose": "^5.11.16",
     "mongoose-auto-increment": "^5.0.1",
     "serve-favicon": "^2.5.0",
